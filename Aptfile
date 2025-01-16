@@ -1,2 +1,3 @@
-git
-git commit -m "Remove asyncio from requirements.txt"
+git add .
+git commit -m "Fix Procfile and requirements"
+git push heroku master
