@@ -1,1 +1,1 @@
-web: python discordmusic.py
+worker: python discordmusic.py
