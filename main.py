@@ -7,7 +7,7 @@ import os
 import requests
 from dotenv import load_dotenv
 
-#토큰 가져오기
+# 토큰 가져오기
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -17,14 +17,14 @@ if TOKEN is None:
 else:
     print("토큰이 성공적으로 로드되었습니다.")
 
-#깃허브 raw URL
+# 깃허브 raw URL
 cookie_file_url = "https://raw.githubusercontent.com/yu-hajin/discordmusic/discordmusic/cookiefile.txt"
 
-#txt 파일 내용 다운로드
+# txt 파일 내용 다운로드
 response = requests.get(cookie_file_url)
 
-#쿠키 파일 경로를 사용하고 싶은 곳에 저장
-cookie_file_path = 'cookies.txt' #쿠키 파일을 로컬에 저장할 경로
+# 쿠키 파일 경로를 사용하고 싶은 곳에 저장
+cookie_file_path = 'cookies.txt'  # 쿠키 파일을 로컬에 저장할 경로
 if response.status_code == 200:
     with open('cookies.txt', 'wb') as f:
         f.write(response.content)
@@ -51,7 +51,7 @@ volume_level = 0.5  # 기본 볼륨 (50%)
 async def on_ready():
     print(f'Logged in as {bot.user}')
 
-#재생하기
+# 재생하기
 @bot.command()
 async def 재생(ctx, *, query: str):
     await ctx.message.delete(delay=5)
@@ -72,7 +72,7 @@ async def 재생(ctx, *, query: str):
             'format': 'bestaudio/best',
             'noplaylist': True,
             'quiet': True,
-            'cookiefile': 'cookies.txt', #쿠키 파일 경로 지정
+            'cookiefile': 'cookies.txt',  # 쿠키 파일 경로 지정
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"ytsearch:{query}", download=False)
@@ -90,7 +90,7 @@ async def 재생(ctx, *, query: str):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'cookiefile': 'cookies.txt', #쿠키 파일 경로 지정
+        'cookiefile': 'cookies.txt',  # 쿠키 파일 경로 지정
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -102,15 +102,15 @@ async def 재생(ctx, *, query: str):
     if not first_track_played:
         first_track_played = True  # 첫 번째 트랙이 재생되었음을 기록
         await ctx.send(f"재생 중: {info['title']}")
-        voice_client.play(source, after=lambda e: asyncio.ensure_future(play_next(ctx)))
+        voice_client.play(source, after=lambda e: asyncio.get_event_loop().create_task(play_next(ctx)))
     else:
         queue.append({'title': info['title'], 'url': url})
         await ctx.send(f"대기열에 추가됨: {info['title']}")
 
-#타임아웃
+# 타임아웃
 async def connect_to_voice_channel(channel):
     try:
-        voice_client = await channel.connect(timeout = 30)
+        voice_client = await channel.connect(timeout=30)
         return voice_client
     except asyncio.TimeoutError:
         print("음성 채널 연결 타임아웃 발생")
@@ -133,13 +133,13 @@ async def play_next(ctx):
     elif repeat_mode == "all":
         queue.append(next_track)
 
-    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': 'cookies.txt'}    #쿠키 파일 경로 지정
+    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': 'cookies.txt'}  # 쿠키 파일 경로 지정
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(next_track['url'], download=False)
         url2 = info['url']
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url2), volume=volume_level)
 
-    voice_client.play(source, after=lambda e: asyncio.ensure_future(play_next(ctx)))
+    voice_client.play(source, after=lambda e: asyncio.get_event_loop().create_task(play_next(ctx)))
     await ctx.send(f"재생 중: {next_track['title']}")
 
 # 대기열 출력
@@ -228,4 +228,4 @@ async def 볼륨(ctx, level: int):
         voice_client.source.volume = volume_level
     await ctx.send(f"볼륨이 {level}%로 설정되었습니다.")
 
-bot.run(os.getenv("DISCORD_TOKEN"))  # 봇 토큰을 입력하세요.
+bot.run(TOKEN)  # 봇 토큰을 입력하세요.
