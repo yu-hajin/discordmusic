@@ -7,9 +7,9 @@ import os
 from dotenv import load_dotenv
 
 #토큰 가져오기
-load_dotenv()
+#load_dotenv()
 
-TOKEN = os.getenv('DISCORD_TOKEN')
+#TOKEN = os.getenv('DISCORD_TOKEN')
 
 if TOKEN is None:
     print("DISCORD_TOKEN을 .env 파일에서 찾을 수 없습니다.")
@@ -200,4 +200,4 @@ async def 볼륨(ctx, level: int):
         voice_client.source.volume = volume_level
     await ctx.send(f"볼륨이 {level}%로 설정되었습니다.")
 
-bot.run(TOKEN)  # 봇 토큰을 입력하세요.
+bot.run(os.getenv("DISCORD_TOKEN")  # 봇 토큰을 입력하세요.
