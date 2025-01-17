@@ -84,7 +84,7 @@ async def 재생(ctx, *, query: str):
                     url = info['entries'][0]['webpage_url']
                 else:
                     await ctx.send("노래를 찾을 수 없습니다. 다시 시도해 주세요.")
-                     return
+                    return
             except youtube_dl.DownloadError as e:
                 await ctx.send("Youtube 인증이 필요하거나 접근할 수 없는 동영상입니다.")
                 print(f"Error: {e}")
