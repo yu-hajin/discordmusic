@@ -111,7 +111,7 @@ async def 재생(ctx, *, query: str):
 # 타임아웃
 async def connect_to_voice_channel(channel):
     try:
-        voice_client = await channel.connect(timeout=30)
+        voice_client = await channel.connect(timeout=60)
         return voice_client
     except asyncio.TimeoutError:
         print("음성 채널 연결 타임아웃 발생")
