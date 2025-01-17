@@ -6,15 +6,9 @@ import asyncio
 import os
 from dotenv import load_dotenv
 
-# .env 파일에서 환경 변수 로드
 load_dotenv()
 
 TOKEN = os.getenv('DISCORD_TOKEN')
-
-if TOKEN is None:
-    print("DISCORD_TOKEN을 .env 파일에서 찾을 수 없습니다.")
-else:
-    print("토큰이 성공적으로 로드되었습니다.")
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -56,17 +50,13 @@ async def 재생(ctx, *, query: str):
             'noplaylist': True,
             'quiet': True,
         }
-        try:
-            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(f"ytsearch:{query}", download=False)
-                if 'entries' in info and len(info['entries']) > 0:
-                    url = info['entries'][0]['webpage_url']
-                else:
-                    await ctx.send("노래를 찾을 수 없습니다. 다시 시도해주세요.")
-                    return
-        except Exception as e:
-            await ctx.send(f"유튜브 검색에서 오류가 발생했습니다: {e}")
-            return
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(f"ytsearch:{query}", download=False)
+            if 'entries' in info and len(info['entries']) > 0:
+                url = info['entries'][0]['webpage_url']
+            else:
+                await ctx.send("노래를 찾을 수 없습니다. 다시 시도해주세요.")
+                return
 
     # 유튜브에서 오디오 다운로드 및 스트리밍 설정
     ydl_opts = {
@@ -204,4 +194,4 @@ async def 볼륨(ctx, level: int):
         voice_client.source.volume = volume_level
     await ctx.send(f"볼륨이 {level}%로 설정되었습니다.")
 
-bot.run(TOKEN)  # 봇 토큰을 입력하세요.
+bot.run(os.getenv("DISCORD_TOKEN"))  # 봇 토큰을 입력하세요.
