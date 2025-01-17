@@ -18,7 +18,7 @@ else:
     print("토큰이 성공적으로 로드되었습니다.")
 
 # 깃허브 raw URL
-cookie_file_url = "https://raw.githubusercontent.com/yu-hajin/discordmusic/discordmusic/cookiefile.txt"
+cookie_file_url = "https://raw.githubusercontent.com/yu-hajin/discordmusic/discordmusic/cookies.txt"
 
 # txt 파일 내용 다운로드
 response = requests.get(cookie_file_url)
