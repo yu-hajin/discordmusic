@@ -51,6 +51,7 @@ volume_level = 0.5  # 기본 볼륨 (50%)
 async def on_ready():
     print(f'Logged in as {bot.user}')
 
+#재생하기
 @bot.command()
 async def 재생(ctx, *, query: str):
     await ctx.message.delete(delay=5)
@@ -105,6 +106,15 @@ async def 재생(ctx, *, query: str):
     else:
         queue.append({'title': info['title'], 'url': url})
         await ctx.send(f"대기열에 추가됨: {info['title']}")
+
+#타임아웃
+async def connect_to_voice_channel(channel):
+    try:
+        voice_client = await channel.connect(timeout = 30)
+        return voice_client
+    except asyncio.TimeoutError:
+        print("음성 채널 연결 타임아웃 발생")
+        return None    
 
 # 다음 트랙 재생
 async def play_next(ctx):
