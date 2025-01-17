@@ -24,9 +24,9 @@ cookie_file_url = "https://raw.githubusercontent.com/yu-hajin/discordmusic/disco
 response = requests.get(cookie_file_url)
 
 #쿠키 파일 경로를 사용하고 싶은 곳에 저장
-cookie_file_path = 'cookiefile.txt' #쿠키 파일을 로컬에 저장할 경로
+cookie_file_path = 'cookies.txt' #쿠키 파일을 로컬에 저장할 경로
 if response.status_code == 200:
-    with open('cookiefile.txt', 'wb') as f:
+    with open('cookies.txt', 'wb') as f:
         f.write(response.content)
     print("쿠키 파일을 성공적으로 다운로드했습니다.")
 else:
@@ -72,7 +72,7 @@ async def 재생(ctx, *, query: str):
             'format': 'bestaudio/best',
             'noplaylist': True,
             'quiet': True,
-            'cookiefile': 'cookiefile.txt', #쿠키 파일 경로 지정
+            'cookiefile': 'cookies.txt', #쿠키 파일 경로 지정
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"ytsearch:{query}", download=False)
@@ -90,7 +90,7 @@ async def 재생(ctx, *, query: str):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'cookiefile': 'cookiefile.txt', #쿠키 파일 경로 지정
+        'cookiefile': 'cookies.txt', #쿠키 파일 경로 지정
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -133,7 +133,7 @@ async def play_next(ctx):
     elif repeat_mode == "all":
         queue.append(next_track)
 
-    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': 'cookiefile.txt'}    #쿠키 파일 경로 지정
+    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': 'cookies.txt'}    #쿠키 파일 경로 지정
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(next_track['url'], download=False)
         url2 = info['url']
