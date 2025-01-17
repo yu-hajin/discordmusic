@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: discord-music-bot
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
+    branch: main
+    region: oregon
+    timeout: 600 # 음성 연결을 위한 시간 증가 (10분)
+    plan: free
