@@ -72,7 +72,7 @@ async def 재생(ctx, *, query: str):
             'format': 'bestaudio/best',
             'noplaylist': True,
             'quiet': True,
-            'cookiefile': cookiefile.txt, #쿠키 파일 경로 지정
+            'cookiefile': 'cookiefile.txt', #쿠키 파일 경로 지정
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"ytsearch:{query}", download=False)
@@ -90,7 +90,7 @@ async def 재생(ctx, *, query: str):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'cookiefile': cookiefile.txt, #쿠키 파일 경로 지정
+        'cookiefile': 'cookiefile.txt', #쿠키 파일 경로 지정
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -133,7 +133,7 @@ async def play_next(ctx):
     elif repeat_mode == "all":
         queue.append(next_track)
 
-    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': cookiefile.txt}    #쿠키 파일 경로 지정
+    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': 'cookiefile.txt'}    #쿠키 파일 경로 지정
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(next_track['url'], download=False)
         url2 = info['url']
