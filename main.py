@@ -21,12 +21,13 @@ else:
 cookie_file_url = "https://raw.githubusercontent.com/yu-hajin/discordmusic/discordmusic/cookies.txt"
 
 # txt 파일 내용 다운로드
+cookie_file_path = 'cookies.txt' #쿠키 파일을 로컬에 저장할 경로
+
 response = requests.get(cookie_file_url)
 
-# 쿠키 파일 경로를 사용하고 싶은 곳에 저장
-cookie_file_path = 'cookies.txt'  # 쿠키 파일을 로컬에 저장할 경로
+#쿠키 파일 다운로드 확인
 if response.status_code == 200:
-    with open('cookies.txt', 'wb') as f:
+    with open(cookie_file_path, 'wb') as f:
         f.write(response.content)
     print("쿠키 파일을 성공적으로 다운로드했습니다.")
 else:
