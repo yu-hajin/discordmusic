@@ -4,6 +4,7 @@ from discord.utils import get
 import yt_dlp as youtube_dl
 import asyncio
 import os
+import requests
 from dotenv import load_dotenv
 
 #토큰 가져오기
@@ -15,6 +16,21 @@ if TOKEN is None:
     print("DISCORD_TOKEN을 .env 파일에서 찾을 수 없습니다.")
 else:
     print("토큰이 성공적으로 로드되었습니다.")
+
+#깃허브 raw URL
+cookie_file_url = "https://raw.githubusercontent.com/yu-hajin/discordmusic/discordmusic/cookiefile.txt"
+
+#txt 파일 내용 다운로드
+response = requests.get(cookie_file_url)
+
+#쿠키 파일 경로를 사용하고 싶은 곳에 저장
+cookie_file_path = 'cookiefile.txt' #쿠키 파일을 로컬에 저장할 경로
+if response.status_code == 200:
+    with open('cookiefile.txt', 'wb') as f:
+        f.write(response.content)
+    print("쿠키 파일을 성공적으로 다운로드했습니다.")
+else:
+    print("쿠키 파일을 다운로드하는 데 실패했습니다.")
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -55,7 +71,7 @@ async def 재생(ctx, *, query: str):
             'format': 'bestaudio/best',
             'noplaylist': True,
             'quiet': True,
-            'cookiefile': 'C://Users//hajin//.vscode//discordbot', #쿠키 파일 경로 지정
+            'cookiefile': cookie_file_path, #쿠키 파일 경로 지정
         }
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"ytsearch:{query}", download=False)
@@ -73,7 +89,7 @@ async def 재생(ctx, *, query: str):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }],
-        'cookiefile': 'C://Users//hajin//.vscode//discordbot', #쿠키 파일 경로 지정
+        'cookiefile': cookie_file_path, #쿠키 파일 경로 지정
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
@@ -107,7 +123,7 @@ async def play_next(ctx):
     elif repeat_mode == "all":
         queue.append(next_track)
 
-    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': 'C://Users//hajin//.vscode//discordbot'}    #쿠키 파일 경로 지정
+    ydl_opts = {'format': 'bestaudio', 'quiet': True, 'cookiefile': cookie_file_path}    #쿠키 파일 경로 지정
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(next_track['url'], download=False)
         url2 = info['url']
