@@ -75,12 +75,19 @@ async def 재생(ctx, *, query: str):
             'quiet': True,
             'cookiefile': 'cookies.txt',  # 쿠키 파일 경로 지정
         }
+
+        #yt-dlp를 사용해 정보 추출
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"ytsearch:{query}", download=False)
-            if 'entries' in info and len(info['entries']) > 0:
-                url = info['entries'][0]['webpage_url']
-            else:
-                await ctx.send("노래를 찾을 수 없습니다. 다시 시도해주세요.")
+            try:
+                info = ydl.extract_info(f"ytsearch:{query}", download=False)
+                if 'entries' in info and len(info['entries']) > 0:
+                    url = info['entries'][0]['webpage_url']
+                else:
+                    await ctx.send("노래를 찾을 수 없습니다. 다시 시도해 주세요.")
+                     return
+            except youtube_dl.DownloadError as e:
+                await ctx.send("Youtube 인증이 필요하거나 접근할 수 없는 동영상입니다.")
+                print(f"Error: {e}")
                 return
 
     # 유튜브에서 오디오 다운로드 및 스트리밍 설정
