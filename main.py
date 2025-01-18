@@ -21,7 +21,7 @@ if not TOKEN:
 secret_file_path = "/etc/secrets/cookies.txt"
 
 #쿠키 파일 다운로드 및 확인
-if not os.path.exitst(cookie_file_path):
+if not os.path.exists(cookie_file_path):
     print(f"쿠키 파일이 {cookie_file_path}에 없습니다.")
 else:
     print(f"쿠키 파일이 {cookie_file_path}에 존재합니다.")
