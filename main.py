@@ -16,7 +16,6 @@ if not TOKEN:
     print("DISCORD_TOKEN을 .env 파일에서 찾을 수 없습니다.")
     exit()
 
-
 #쿠키 파일 경로 설정
 secret_file_path = "/etc/secrets/cookies.txt"
 
