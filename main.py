@@ -16,23 +16,15 @@ if not TOKEN:
     print("DISCORD_TOKEN을 .env 파일에서 찾을 수 없습니다.")
     exit()
 
-# 깃허브 raw URL
-cookie_file_url = "https://raw.githubusercontent.com/yu-hajin/discordmusic/discordmusic/cookies.txt"
 
 #쿠키 파일 경로 설정
-cookie_file_path = 'cookies.txt'
+secret_file_path = "/etc/secrets/cookies.txt"
 
 #쿠키 파일 다운로드 및 확인
-try:
-    response = requests.get(cookie_file_url)
-    if response.status_code == 200:
-        with open(cookie_file_path, 'wb') as f:
-            f.write(response.content)
-        print("쿠키 파일을 성공적으로 다운로드했습니다.")
-    else:
-        print("쿠키 파일 다운로드에 실패했습니다. 쿠키가 필요한 동영상에서는 문제가 발생할 수 있습니다.")
-except Exception as e:
-    print(f"쿠키 파일 다운로드 중 오류가 발생했습니다: {e}")
+if not os.path.exitst(cookie_file_path):
+    print(f"쿠키 파일이 {cookie_file_path}에 없습니다.")
+else:
+    print(f"쿠키 파일이 {cookie_file_path}에 존재합니다.")
 
 intents = discord.Intents.default()
 intents.messages = True
