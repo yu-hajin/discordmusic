@@ -29,7 +29,7 @@ def download_cookie_file(url, local_path):
         return None
 
 #URL 및 로컬 경로 설정
-cookie_file_url = "https://github.com/yu-hajin/discordmusic/blob/discordmusic/cookie.txt"
+cookie_file_url = "https://github.com/yu-hajin/discordmusic/blob/discordmusic/cookies.txt"
 local_cookie_path = "./cookies.txt" #로컬 경로
 
 #쿠키 파일 다운로드 및 경로 설정
