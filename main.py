@@ -4,6 +4,7 @@ from discord.utils import get
 import yt_dlp as youtube_dl
 import asyncio
 import os
+import requests
 from dotenv import load_dotenv
 
 # 토큰 가져오기
@@ -14,14 +15,29 @@ if not TOKEN:
     print("DISCORD_TOKEN을 .env 파일에서 찾을 수 없습니다.")
     exit()
 
-#쿠키 파일 경로 설정
-cookie_file_path = "https://discordmusic-ed55.onrender.com/etc/secrets/cookies.txt"
+#쿠키 파일 다운로드
+def download_cookie_file(url, local_path):
+    try:
+        response = requests.get(url)
+        response.raise_for_status() #HTTP 오류가 발생하면 예외를 발생시킴
+        with open(local_path, "wb") as file:
+            file.write(response.content)
+        print(f"쿠키 파일이 {local_path}에 저장되었습니다.")
+        return local_path
+    except requests.RequestException as e:
+        print(f"쿠키 파일 다운로드 중 오류 발생: {e}")
+        return None
 
-#쿠키 파일 다운로드 및 확인
-if not os.path.exists(cookie_file_path):
-    print(f"쿠키 파일이 {cookie_file_path}에 없습니다.")
-else:
-    print(f"쿠키 파일이 {cookie_file_path}에 존재합니다.")
+#URL 및 로컬 경로 설정
+cookie_file_url = "https://discordmusic-ed55.onrender.com/etc/secrets/cookies.txt"
+local_cookie_path = "./cookies.txt" #로컬 경로
+
+#쿠키 파일 다운로드 및 경로 설정
+cookie_file_path = download_cookie_file(cookie_file_url, local_cookie_path)
+
+if not cookie_file_path:
+    print("쿠키 파일을 사용할 수 없습니다. 봇을 종료합니다.")
+    exit()
 
 intents = discord.Intents.default()
 intents.messages = True
