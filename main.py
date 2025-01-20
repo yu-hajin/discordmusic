@@ -4,12 +4,10 @@ from discord.utils import get
 import yt_dlp as youtube_dl
 import asyncio
 import os
-import requests
 from dotenv import load_dotenv
 
 # 토큰 가져오기
 load_dotenv()
-
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 if not TOKEN:
@@ -17,7 +15,7 @@ if not TOKEN:
     exit()
 
 #쿠키 파일 경로 설정
-secret_file_path = "/etc/secrets/cookies.txt"
+cookie_file_path = "https://discordmusic-ed55.onrender.com/etc/secrets/cookies.txt"
 
 #쿠키 파일 다운로드 및 확인
 if not os.path.exists(cookie_file_path):
@@ -47,40 +45,44 @@ async def on_ready():
 # 재생하기
 @bot.command()
 async def 재생(ctx, *, query: str):
-    await ctx.message.delete(delay=5)
-    channel = ctx.author.voice.channel
-    if not channel:
-        await ctx.send("음성 채널에 먼저 접속해주세요!")
+    try:
+        await ctx.message.delete(delay = 5)
+    except Exception:
+        pass
+
+    if not ctx.author.voice:
+        await ctx.send("먼저 음성 채널에 접속해 주세요!")
         return
 
-    voice_client = get(bot.voice_clients, guild=ctx.guild)
+    channel = ctx.author.voice.channel
+    voice_client = get(bot.voice_clients, guild = ctx.guild)
     if not voice_client:
         voice_client = await channel.connect()
 
-    if "youtube.com" in query or "youtu.be" in query:
-        url = query
-    else:
-        # YouTube 검색 실행
-        ydl_opts = {
-            'format': 'bestaudio/best',
-            'noplaylist': True,
-            'quiet': True,
-            'cookiefile': cookie_file_path,  # 쿠키 파일 경로 지정
-        }
+    #검색 및 URL 처리
+    ydl_opts = {
+        "format" : "bestaudio/best",
+        "noplaylist" : True,
+        "quiet" : True,
+        "cookiefile" : cookie_file_path,    #쿠키 파일 경로
+    }
 
-        #yt-dlp를 사용해 정보 추출
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            try:
-                info = ydl.extract_info(f"ytsearch:{query}", download=False)
-                if 'entries' in info and len(info['entries']) > 0:
-                    url = info['entries'][0]['webpage_url']
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        try:
+            if "youtube.com" in query or "youtu.be" in query:
+                url = query
+            else:
+                #Youtube 검색
+                info = ydl.extract_info(f"ytsearch: {query}", download=False)
+                if "entries" in info and len(info["entries"]) > 0:
+                    url = info["entries"][0]["webpage_url"]
                 else:
                     await ctx.send("노래를 찾을 수 없습니다. 다시 시도해 주세요.")
                     return
-            except youtube_dl.DownloadError as e:
-                await ctx.send("Youtube 인증이 필요하거나 접근할 수 없는 동영상입니다.")
-                print(f"Error: {e}")
-                return
+        except youtube_dl.DownloadError as e:
+            await ctx.send("Youtube 인증이 필요하거나 접근할 수 없는 동영상입니다.")
+            print(f"Error: {e}")
+            return
 
     # 유튜브에서 오디오 다운로드 및 스트리밍 설정
     ydl_opts = {
@@ -98,38 +100,31 @@ async def 재생(ctx, *, query: str):
         url2 = info['url']
         source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(url2), volume=volume_level)
 
-    # 첫 번째 트랙인 경우 대기열에 추가하지 않음
+    #재생
     global first_track_played
     if not first_track_played:
-        first_track_played = True  # 첫 번째 트랙이 재생되었음을 기록
+        first_track_played = True
         await ctx.send(f"재생 중: {info['title']}")
-        voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx), bot.loop))
+        voice_client.play(source, after=lambda _: asyncio.ensure_future(play_next(ctx)))
     else:
-        queue.append({'title': info['title'], 'url': url})
-        await ctx.send(f"대기열에 추가됨: {info['title']}")
-
-# 타임아웃
-async def connect_to_voice_channel(channel):
-    try:
-        voice_client = await channel.connect(timeout=60)
-        return voice_client
-    except asyncio.TimeoutError:
-        print("음성 채널 연결 타임아웃 발생")
-        return None    
+        queue.append({"title": info["title"], "url": url})
+        await ctx.send(f"대기열에 추가됨: {info['title']}")    
 
 # 다음 트랙 재생
 async def play_next(ctx):
     global queue, repeat_mode, first_track_played, played_tracks
-    voice_client = get(bot.voice_clients, guild=ctx.guild)
+    
     if not queue:
+        voice_client = get(bot.voice_clients, guild=ctx.guild)
         if voice_client:
             await voice_client.disconnect()
-        await ctx.send("대기열이 비어 있습니다. 음성 채널을 떠납니다.")
         first_track_played = False
+        await ctx.send("대기열이 비어 있습니다. 음성 채널을 떠납니다.")
         return
 
     next_track = queue.pop(0)
     played_tracks.append(next_track)
+    
     if repeat_mode == "track":
         queue.insert(0, next_track)
     elif repeat_mode == "all":
@@ -143,6 +138,15 @@ async def play_next(ctx):
 
     voice_client.play(source, after=lambda e: asyncio.run_coroutine_threadsafe(play_next(ctx), bot.loop))
     await ctx.send(f"재생 중: {next_track['title']}")
+
+# 타임아웃
+async def connect_to_voice_channel(channel):
+    try:
+        voice_client = await channel.connect(timeout=60)
+        return voice_client
+    except asyncio.TimeoutError:
+        print("음성 채널 연결 타임아웃 발생")
+        return None
 
 # 대기열 출력
 @bot.command()
